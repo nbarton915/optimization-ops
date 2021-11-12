@@ -33,6 +33,7 @@ jobs:
           echo "Sync Job is $job_status"
   solve-test:
     runs-on: ubuntu-latest
+    needs: sync-repository
     steps:
       -
         name: Checkout
