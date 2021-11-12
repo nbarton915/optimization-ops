@@ -24,8 +24,8 @@ jobs:
         env:
           optilogic_token: ${{ steps.get_token.outputs.optilogic_token }}
           optilogic_workspace: 'Studio'
-          optilogic_directory_path: ''
-          optilogic_filename: ''
+          optilogic_directory_path: 'My Models/optimization-ops/optilogic'
+          optilogic_filename: 'sync_repo.py'
         run: |
           job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename")
           echo "::set-output name=sync_job_key::$job_key"
