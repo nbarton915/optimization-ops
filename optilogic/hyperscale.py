@@ -19,7 +19,7 @@ def complete_job_args(args, dir):
         filename=args.filename,
         apiKey=args.apiKey,
         commandArgs=f'--scenario={dir}',
-        jobTags='hyperscale'
+        jobTags='hyperscale,{dir}'
     )
     return job_args
 
