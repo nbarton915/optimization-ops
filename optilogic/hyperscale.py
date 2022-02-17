@@ -10,6 +10,7 @@ class JobArgs(object):
     filename: str
     apiKey: str
     commandArgs: str
+    jobTags: str
 
 def complete_job_args(args, dir):
     job_args = JobArgs(
@@ -17,7 +18,8 @@ def complete_job_args(args, dir):
         directoryPath=args.directoryPath,
         filename=args.filename,
         apiKey=args.apiKey,
-        commandArgs=f'--scenario={dir}'
+        commandArgs=f'--scenario={dir}',
+        jobTags='hyperscale'
     )
     return job_args
 
