@@ -22,7 +22,7 @@ def complete_job_args(args, dir):
     return job_args
 
 def hyperscale(args):
-    scenario_directories = os.listdir(f'{os.getcwd()}/../data')
+    scenario_directories = os.listdir(f'{os.getcwd()}/data')
 
     all_job_args = list(map(lambda x: complete_job_args(args, x), scenario_directories))
     for a in all_job_args:
