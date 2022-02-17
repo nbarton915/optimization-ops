@@ -22,14 +22,14 @@ param present_cars :=
 param required_cars :=
 1 10
 2 12
-3 14
+3 13
 4 11
 5 9
 6 7
 7 15
 8 7
 9 9
-10 0
+10 1
 ;
 
 #X-coordinate of each agency
