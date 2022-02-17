@@ -14,7 +14,7 @@ def create_job(args):
     job_object = json.loads(response.text)
     try:
         job_key = job_object['jobKey']
-        print(job_key)
+        return job_key
     except Exception as e:
         print(f'There was an error with getting the jobKey\n\nResponse: {job_object}')
 
@@ -27,4 +27,5 @@ if __name__ == '__main__':
     parser.add_argument('--commandArgs', help='Arg to pass to python')
 
     args = parser.parse_args()
-    create_job(args)
+    job_key = create_job(args)
+    print(job_key)
