@@ -5,9 +5,20 @@
 # of cars so as to satisfy the requirements of each agency and minimizing the 
 # total cost of transportation.
 
+import argparse
 from pyomo.environ import *
 import math
 import os
+
+parser = argparse.ArgumentParser(description='Create a new Optilogic Job')
+parser.add_argument('--scenario', help='Name for input data scenario')
+
+args = parser.parse_args()
+
+if args.scenario:
+    scenario_dir = args.scenario
+else:
+    scenario_dir = 'baseline'
 
 model = AbstractModel("Car rental")
 
@@ -71,7 +82,7 @@ model.need_satisfy = Constraint(model.need_agencies, rule = need_satisfy)
 
 
 solver = SolverFactory('gurobi_direct')
-instance = model.create_instance(f"{os.getcwd()}/../data/car_rental.dat")
+instance = model.create_instance(f"{os.getcwd()}/../data/{scenario_dir}/car_rental.dat")
 results = solver.solve(instance)
 
 #Python Script for printing the solution in the terminal
