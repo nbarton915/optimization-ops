@@ -51,7 +51,7 @@ jobs:
           optilogic_workspace: 'Studio'
           optilogic_directory_path: 'My Models/optimization-ops/src'
           optilogic_filename: 'car_rental.py'
-          commandArgs: 'baseline'
+          commandArgs: '--scenario=baseline'
         run: |
           job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" --commandArgs="$commandArgs")
           echo "::set-output name=sync_job_key::$job_key"
