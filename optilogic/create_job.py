@@ -4,7 +4,6 @@ import requests
 
 def create_job(args):
     url = f'https://api.optilogic.app/v0/{args.workspace}/job?directoryPath={args.directoryPath}&filename={args.filename}'
-    print(args.timeout)
     if args.commandArgs:
         url += f'&commandArgs={args.commandArgs}'
     if hasattr(args, 'timeout') and args.timeout:
