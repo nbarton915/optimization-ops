@@ -104,7 +104,7 @@ jobs:
           optilogic_directory_path: 'My Models/optimization-ops/src'
           optilogic_filename: 'solve.py'
           commandArgs: '--scenario=baseline -ttt'
-          jobTags: $(git rev-parse --short "$GITHUB_SHA")
         run: |
-          job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" --commandArgs="$commandArgs" --jobTags="$jobTags,timetest" -d)
+          shaTag=$(git rev-parse --short "$GITHUB_SHA") && \
+          job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" --commandArgs="$commandArgs" --jobTags="$shaTag,timetest" -d)
           echo "::set-output name=sync_job_key::$job_key"
