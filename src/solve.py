@@ -7,6 +7,7 @@ If you have any questions please reach out to Optilogic support at support@optil
 # Import needed modules
 # ---------------------------------------------
 import argparse
+from tabnanny import check
 import gurobipy as gp
 from gurobipy import GRB
 import datetime as dt
@@ -15,8 +16,15 @@ import common # this imports the common.py file
 
 parser = argparse.ArgumentParser(description='Create a new Optilogic Job')
 parser.add_argument('--scenario', help='Scenario to run')
+parser.add_argument('--timetest', '-t', action='count', default=0, help='Add n minutes to the beginning of the solve')
 
 args = parser.parse_args()
+
+import time
+minutes = args.timetest*60
+checkpoints = minutes / 10 #report on 10 second intervals
+for c in range(0, checkpoints):
+    time.sleep(10)
 
 if args.scenario:
     input_scenario_directory = args.scenario
