@@ -6,10 +6,10 @@ def create_job(args):
     url = f'https://api.optilogic.app/v0/{args.workspace}/job?directoryPath={args.directoryPath}&filename={args.filename}'
     if args.commandArgs:
         url += f'&commandArgs={args.commandArgs}'
-    if args.jobTags:
-        url += f'&tags={args.jobTags}'
     if hasattr(args, 'timeout') and args.timeout:
         url += f'&timout={args.timeout}'
+    if args.jobTags:
+        url += f'&tags={args.jobTags}'
     if args.d:
         url = url.replace('api.', 'dev.api.')
     headers = {
