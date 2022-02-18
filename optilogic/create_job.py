@@ -8,7 +8,7 @@ def create_job(args):
         url += f'&commandArgs={args.commandArgs}'
     if args.jobTags:
         url += f'&tags={args.jobTags}'
-    if args.timeout:
+    if hasattr(args, 'timeout') and args.timeout:
         url += f'&timout={args.timeout}'
     if args.d:
         url = url.replace('api.', 'dev.api.')
