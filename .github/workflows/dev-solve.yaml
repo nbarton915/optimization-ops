@@ -106,4 +106,4 @@ jobs:
           commandArgs: '--scenario=baseline -ttt'
         run: |
           shaTag=$(git rev-parse --short "$GITHUB_SHA") && \
-          python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" --commandArgs="$commandArgs" --jobTags="$shaTag,timetest" --timeout="20" -d
+          python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" --commandArgs="$commandArgs" --timeout=20 --jobTags="$shaTag,timetest" -d

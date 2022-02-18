@@ -7,8 +7,7 @@ def create_job(args):
     if args.commandArgs:
         url += f'&commandArgs={args.commandArgs}'
     if hasattr(args, 'timeout') and args.timeout:
-        url += f'&timout={args.timeout}'
-        print('hasattr')
+        url += f'&timeout={args.timeout}'
     if args.jobTags:
         url += f'&tags={args.jobTags}'
     if args.d:
