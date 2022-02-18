@@ -18,9 +18,9 @@ import common # this imports the common.py file
 modelName = 'advanced'
 
 # Path objects
-inputPath = common.ensureDirectory("inputs") # Relative path to input files
-outputPath = common.ensureDirectory("outputs") # Relative path to output files
-logPath = common.ensureDirectory("logs") # Relative path to log file
+inputPath = common.ensureDirectory("../inputs/baseline") # Relative path to input files
+outputPath = common.ensureDirectory("../outputs") # Relative path to output files
+logPath = common.ensureDirectory("../logs") # Relative path to log file
 
 # Filename variables
 logFilename = logPath / f"{dt.datetime.now()}.log"
