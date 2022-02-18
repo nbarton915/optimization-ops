@@ -8,6 +8,8 @@ def create_job(args):
         url += f'&commandArgs={args.commandArgs}'
     if args.jobTags:
         url += f'&tags={args.jobTags}'
+    if args.d:
+        url = url.replace('api.', 'dev.api.')
     headers = {
         'X-API-KEY': f'{args.apiKey}'
         }
@@ -28,6 +30,7 @@ if __name__ == '__main__':
     parser.add_argument('--apiKey', help='Optilogic Token ')
     parser.add_argument('--commandArgs', help='Arg to pass to python')
     parser.add_argument('--jobTags', help='Tags to add to job')
+    parser.add_argument('-d', action='store_true')
 
     args = parser.parse_args()
     job_key = create_job(args)

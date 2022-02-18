@@ -3,12 +3,12 @@ name: Solve Model
 on:
   push:
     branches:
-      - main
+      - test
 
 jobs:
   sync-repository:
     runs-on: ubuntu-latest
-    environment: production
+    environment: test
     steps:
       -
         name: Checkout
@@ -17,25 +17,25 @@ jobs:
         name: Get New Optilogic Token
         id: get_token
         run: |
-          token=$(python optilogic/get_token.py --username=${{ secrets.OPTILOGIC_USERNAME }} --password=${{ secrets.OPTILOGIC_PASSWORD }})
+          token=$(python optilogic/get_token.py --username=${{ secrets.OPTILOGIC_USERNAME }} --password=${{ secrets.OPTILOGIC_PASSWORD }} -d)
           echo "::set-output name=optilogic_token::$token"
       -
         name: Optilogic Sync Job
         id: sync-repository
         env:
           optilogic_token: ${{ steps.get_token.outputs.optilogic_token }}
-          optilogic_workspace: 'Studio'
+          optilogic_workspace: 'Ursa-Minor'
           optilogic_directory_path: 'My Models/optimization-ops/optilogic'
           optilogic_filename: 'sync_repo.py'
         run: |
-          job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename")
+          job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" -d)
           echo "::set-output name=sync_job_key::$job_key"
-          job_status=$(python optilogic/wait_for_job_completion.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKey=$job_key)
+          job_status=$(python optilogic/wait_for_job_completion.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKey=$job_key -d)
           echo "Sync Job is $job_status"
   solve-test:
     runs-on: ubuntu-latest
     needs: sync-repository
-    environment: production
+    environment: test
     steps:
       -
         name: Checkout
@@ -44,25 +44,25 @@ jobs:
         name: Get New Optilogic Token
         id: get_token
         run: |
-          token=$(python optilogic/get_token.py --username=${{ secrets.OPTILOGIC_USERNAME }} --password=${{ secrets.OPTILOGIC_PASSWORD }})
+          token=$(python optilogic/get_token.py --username=${{ secrets.OPTILOGIC_USERNAME }} --password=${{ secrets.OPTILOGIC_PASSWORD }} -d)
           echo "::set-output name=optilogic_token::$token" 
       -
         name: Solve Model
         env:
           optilogic_token: ${{ steps.get_token.outputs.optilogic_token }}
-          optilogic_workspace: 'Studio'
+          optilogic_workspace: 'Ursa-Minor'
           optilogic_directory_path: 'My Models/optimization-ops/src'
           optilogic_filename: 'solve.py'
           commandArgs: '--scenario=baseline'
         run: |
-          job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" --commandArgs="$commandArgs")
+          job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" --commandArgs="$commandArgs" -d)
           echo "::set-output name=sync_job_key::$job_key"
-          job_status=$(python optilogic/wait_for_job_completion.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKey=$job_key)
+          job_status=$(python optilogic/wait_for_job_completion.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKey=$job_key -d)
           echo "Sync Job is $job_status"
   hyperscale-all-scenarios:
     runs-on: ubuntu-latest
     needs: sync-repository
-    environment: production
+    environment: test
     steps:
       -
         name: Checkout
@@ -71,14 +71,14 @@ jobs:
         name: Get New Optilogic Token
         id: get_token
         run: |
-          token=$(python optilogic/get_token.py --username=${{ secrets.OPTILOGIC_USERNAME }} --password=${{ secrets.OPTILOGIC_PASSWORD }})
+          token=$(python optilogic/get_token.py --username=${{ secrets.OPTILOGIC_USERNAME }} --password=${{ secrets.OPTILOGIC_PASSWORD }} -d)
           echo "::set-output name=optilogic_token::$token" 
       -
         name: Start Hyperscale
         env:
           optilogic_token: ${{ steps.get_token.outputs.optilogic_token }}
-          optilogic_workspace: 'Studio'
+          optilogic_workspace: 'Ursa-Minor'
           optilogic_directory_path: 'My Models/optimization-ops/src'
           optilogic_filename: 'solve.py'
         run: |
-          python optilogic/hyperscale.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename"
+          python optilogic/hyperscale.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" -d
