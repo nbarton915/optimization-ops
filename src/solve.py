@@ -6,11 +6,22 @@ If you have any questions please reach out to Optilogic support at support@optil
 # ---------------------------------------------
 # Import needed modules
 # ---------------------------------------------
+import argparse
 import gurobipy as gp
 from gurobipy import GRB
 import datetime as dt
 import logging
 import common # this imports the common.py file
+
+parser = argparse.ArgumentParser(description='Create a new Optilogic Job')
+parser.add_argument('--scenario', help='Scenario to run')
+
+args = parser.parse_args()
+
+if args.scenario:
+    input_scenario_directory = args.scenario
+else:
+    input_scenario_directory = 'baseline'
 
 # ---------------------------------------------
 # Initialization
@@ -18,7 +29,7 @@ import common # this imports the common.py file
 modelName = 'advanced'
 
 # Path objects
-inputPath = common.ensureDirectory("../inputs/baseline") # Relative path to input files
+inputPath = common.ensureDirectory(f"../inputs/{input_scenario_directory}") # Relative path to input files
 outputPath = common.ensureDirectory("../outputs") # Relative path to output files
 logPath = common.ensureDirectory("../logs") # Relative path to log file
 
