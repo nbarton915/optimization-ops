@@ -11,6 +11,7 @@ class JobArgs(object):
     apiKey: str
     commandArgs: str
     jobTags: str
+    d: bool
 
 def complete_job_args(args, dir):
     job_args = JobArgs(
