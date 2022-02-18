@@ -24,6 +24,7 @@ import time
 minutes = args.timetest*60
 checkpoints = minutes / 10 #report on 10 second intervals
 for c in range(0, checkpoints):
+    print(f'{c} seconds have passed')
     time.sleep(10)
 
 if args.scenario:
