@@ -1,0 +1,16 @@
+warehouse_name,customer_name,transport_cost
+Warehouse_1,customer_1,11
+Warehouse_2,customer_1,12
+Warehouse_3,customer_1,13
+Warehouse_4,customer_1,14
+Warehouse_5,customer_1,15
+Warehouse_1,customer_2,21
+Warehouse_2,customer_2,22
+Warehouse_3,customer_2,23
+Warehouse_4,customer_2,24
+Warehouse_5,customer_2,25
+Warehouse_1,customer_3,31
+Warehouse_2,customer_3,32
+Warehouse_3,customer_3,33
+Warehouse_4,customer_3,34
+Warehouse_5,customer_3,35

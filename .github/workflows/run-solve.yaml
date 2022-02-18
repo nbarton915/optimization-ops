@@ -1,4 +1,4 @@
-name: Solve Car Rental Model
+name: Solve Model
 
 on:
   push:
@@ -50,7 +50,7 @@ jobs:
           optilogic_token: ${{ steps.get_token.outputs.optilogic_token }}
           optilogic_workspace: 'Studio'
           optilogic_directory_path: 'My Models/optimization-ops/src'
-          optilogic_filename: 'car_rental.py'
+          optilogic_filename: 'solve.py'
           commandArgs: '--scenario=baseline'
         run: |
           job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" --commandArgs="$commandArgs")
@@ -76,6 +76,6 @@ jobs:
           optilogic_token: ${{ steps.get_token.outputs.optilogic_token }}
           optilogic_workspace: 'Studio'
           optilogic_directory_path: 'My Models/optimization-ops/src'
-          optilogic_filename: 'car_rental.py'
+          optilogic_filename: 'solve.py'
         run: |
           python optilogic/hyperscale.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename"
