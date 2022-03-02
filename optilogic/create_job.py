@@ -6,6 +6,8 @@ def create_job(args):
     url = f'https://api.optilogic.app/v0/{args.workspace}/job?directoryPath={args.directoryPath}&filename={args.filename}'
     if args.commandArgs:
         url += f'&commandArgs={args.commandArgs}'
+    if hasattr(args, 'timeout') and args.timeout:
+        url += f'&timeout={args.timeout}'
     if args.jobTags:
         url += f'&tags={args.jobTags}'
     if args.d:
@@ -30,6 +32,7 @@ if __name__ == '__main__':
     parser.add_argument('--apiKey', help='Optilogic Token ')
     parser.add_argument('--commandArgs', help='Arg to pass to python')
     parser.add_argument('--jobTags', help='Tags to add to job')
+    parser.add_argument('--timeout', help='Max time for job to run')
     parser.add_argument('-d', action='store_true')
 
     args = parser.parse_args()

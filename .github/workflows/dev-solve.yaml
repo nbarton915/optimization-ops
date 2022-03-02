@@ -59,10 +59,13 @@ jobs:
           echo "::set-output name=sync_job_key::$job_key"
           job_status=$(python optilogic/wait_for_job_completion.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKey=$job_key -d)
           echo "Sync Job is $job_status"
-  hyperscale-all-scenarios:
+  timetest:
     runs-on: ubuntu-latest
     needs: sync-repository
     environment: test
+    strategy:
+      matrix:
+        timeout: [20, 21, 121, 300]
     steps:
       -
         name: Checkout
@@ -72,13 +75,19 @@ jobs:
         id: get_token
         run: |
           token=$(python optilogic/get_token.py --username=${{ secrets.OPTILOGIC_USERNAME }} --password=${{ secrets.OPTILOGIC_PASSWORD }} -d)
-          echo "::set-output name=optilogic_token::$token" 
+          echo "::set-output name=optilogic_token::$token"
       -
-        name: Start Hyperscale
+        name: Solve Model
         env:
           optilogic_token: ${{ steps.get_token.outputs.optilogic_token }}
           optilogic_workspace: 'Ursa-Minor'
           optilogic_directory_path: 'My Models/optimization-ops/src'
           optilogic_filename: 'solve.py'
+          commandArgs: '--scenario=baseline -tt'
+          timeout: ${{ matrix.timeout }}
         run: |
-          python optilogic/hyperscale.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" -d
+          shaTag=$(git rev-parse --short "$GITHUB_SHA") && \
+          job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" --commandArgs="$commandArgs" --timeout=$timeout --jobTags="$shaTag,timetest" -d)
+          echo "::set-output name=sync_job_key::$job_key"
+          job_status=$(python optilogic/wait_for_job_completion.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKey=$job_key -d)
+          echo "Sync Job is $job_status"
