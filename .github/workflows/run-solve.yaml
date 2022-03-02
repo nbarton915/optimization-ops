@@ -85,7 +85,7 @@ jobs:
   timetest:
     runs-on: ubuntu-latest
     needs: sync-repository
-    environment: test
+    environment: production
     strategy:
       matrix:
         timeout: [20, 21, 121, 300]
