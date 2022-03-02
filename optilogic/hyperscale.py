@@ -20,7 +20,7 @@ def complete_job_args(args, dir):
         filename=args.filename,
         apiKey=args.apiKey,
         commandArgs=f'--scenario={dir}',
-        jobTags='hyperscale,{dir}',
+        jobTags=f'hyperscale,{dir},{args.jobTags}',
         d=args.d
     )
     return job_args
@@ -41,6 +41,7 @@ if __name__ == '__main__':
     parser.add_argument('--directoryPath', help='Optilogic Path to Directory')
     parser.add_argument('--filename', help='Optilogic Filename')
     parser.add_argument('--apiKey', help='Optilogic Token ')
+    parser.add_argument('--jobTags', help='List of tags for the job')
     parser.add_argument('-d', action='store_true')
 
     args = parser.parse_args()
