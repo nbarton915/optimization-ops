@@ -28,7 +28,8 @@ jobs:
           optilogic_directory_path: 'My Models/optimization-ops/optilogic'
           optilogic_filename: 'sync_repo.py'
         run: |
-          job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename")
+          shaTag=$(git rev-parse --short "$GITHUB_SHA") && \
+          job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" --jobTags="$shaTag,syncrepo")
           echo "::set-output name=sync_job_key::$job_key"
           job_status=$(python optilogic/wait_for_job_completion.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKey=$job_key)
           echo "Sync Job is $job_status"
@@ -72,7 +73,6 @@ jobs:
         name: Get New Optilogic Token
         id: get_token
         run: |
-          shaTag=$(git rev-parse --short "$GITHUB_SHA") && \
           token=$(python optilogic/get_token.py --username=${{ secrets.OPTILOGIC_USERNAME }} --password=${{ secrets.OPTILOGIC_PASSWORD }})
           echo "::set-output name=optilogic_token::$token" 
       -
@@ -83,6 +83,7 @@ jobs:
           optilogic_directory_path: 'My Models/optimization-ops/src'
           optilogic_filename: 'solve.py'
         run: |
+          shaTag=$(git rev-parse --short "$GITHUB_SHA") && \
           python optilogic/hyperscale.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" --jobTags="$shaTag"
   timetest:
     runs-on: ubuntu-latest
