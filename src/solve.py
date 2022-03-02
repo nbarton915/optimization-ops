@@ -18,7 +18,7 @@ import common # this imports the common.py file
 parser = argparse.ArgumentParser(description='Create a new Optilogic Job')
 parser.add_argument('--scenario', help='Scenario to run')
 parser.add_argument('--timetest', '-t', action='count', default=0, help='Add n minutes to the beginning of the solve')
-parser.add_argument('--oomtest', '-oo', help='run test that gets oom killed')
+parser.add_argument('--oomtest', '-oo', action='store_true', help='run test that gets oom killed')
 
 args = parser.parse_args()
 
