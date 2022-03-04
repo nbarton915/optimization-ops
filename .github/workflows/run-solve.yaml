@@ -28,7 +28,8 @@ jobs:
           optilogic_directory_path: 'My Models/optimization-ops/optilogic'
           optilogic_filename: 'sync_repo.py'
         run: |
-          job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename")
+          shaTag=$(git rev-parse --short "$GITHUB_SHA") && \
+          job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" --jobTags="$shaTag,syncrepo")
           echo "::set-output name=sync_job_key::$job_key"
           job_status=$(python optilogic/wait_for_job_completion.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKey=$job_key)
           echo "Sync Job is $job_status"
@@ -55,7 +56,8 @@ jobs:
           optilogic_filename: 'solve.py'
           commandArgs: '--scenario=baseline'
         run: |
-          job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" --commandArgs="$commandArgs")
+          shaTag=$(git rev-parse --short "$GITHUB_SHA") && \
+          job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" --commandArgs="$commandArgs" --jobTags="$shaTag,solvetest")
           echo "::set-output name=sync_job_key::$job_key"
           job_status=$(python optilogic/wait_for_job_completion.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKey=$job_key)
           echo "Sync Job is $job_status"
@@ -81,11 +83,12 @@ jobs:
           optilogic_directory_path: 'My Models/optimization-ops/src'
           optilogic_filename: 'solve.py'
         run: |
-          python optilogic/hyperscale.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename"
+          shaTag=$(git rev-parse --short "$GITHUB_SHA") && \
+          python optilogic/hyperscale.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" --jobTags="$shaTag"
   timetest:
     runs-on: ubuntu-latest
     needs: sync-repository
-    environment: test
+    environment: production
     strategy:
       matrix:
         timeout: [20, 21, 121, 300]
@@ -97,7 +100,7 @@ jobs:
         name: Get New Optilogic Token
         id: get_token
         run: |
-          token=$(python optilogic/get_token.py --username=${{ secrets.OPTILOGIC_USERNAME }} --password=${{ secrets.OPTILOGIC_PASSWORD }} -d)
+          token=$(python optilogic/get_token.py --username=${{ secrets.OPTILOGIC_USERNAME }} --password=${{ secrets.OPTILOGIC_PASSWORD }})
           echo "::set-output name=optilogic_token::$token"
       -
         name: Solve Model
@@ -110,7 +113,35 @@ jobs:
           timeout: ${{ matrix.timeout }}
         run: |
           shaTag=$(git rev-parse --short "$GITHUB_SHA") && \
-          job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" --commandArgs="$commandArgs" --timeout=$timeout --jobTags="$shaTag,timetest" -d)
+          job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" --commandArgs="$commandArgs" --timeout=$timeout --jobTags="$shaTag,timetest")
           echo "::set-output name=sync_job_key::$job_key"
-          job_status=$(python optilogic/wait_for_job_completion.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKey=$job_key -d)
+          job_status=$(python optilogic/wait_for_job_completion.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKey=$job_key)
+          echo "Sync Job is $job_status"
+  oomtest:
+    runs-on: ubuntu-latest
+    needs: sync-repository
+    environment: production
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2 
+      -
+        name: Get New Optilogic Token
+        id: get_token
+        run: |
+          token=$(python optilogic/get_token.py --username=${{ secrets.OPTILOGIC_USERNAME }} --password=${{ secrets.OPTILOGIC_PASSWORD }})
+          echo "::set-output name=optilogic_token::$token"
+      -
+        name: Solve Model
+        env:
+          optilogic_token: ${{ steps.get_token.outputs.optilogic_token }}
+          optilogic_workspace: 'Studio'
+          optilogic_directory_path: 'My Models/optimization-ops/src'
+          optilogic_filename: 'solve.py'
+          commandArgs: '--scenario=baseline -oo'
+        run: |
+          shaTag=$(git rev-parse --short "$GITHUB_SHA") && \
+          job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" --commandArgs="$commandArgs" --jobTags="$shaTag,oomtest")
+          echo "::set-output name=sync_job_key::$job_key"
+          job_status=$(python optilogic/wait_for_job_completion.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKey=$job_key)
           echo "Sync Job is $job_status"
