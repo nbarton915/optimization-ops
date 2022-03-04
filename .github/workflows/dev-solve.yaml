@@ -91,3 +91,31 @@ jobs:
           echo "::set-output name=sync_job_key::$job_key"
           job_status=$(python optilogic/wait_for_job_completion.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKey=$job_key -d)
           echo "Sync Job is $job_status"
+  oomtest:
+    runs-on: ubuntu-latest
+    needs: sync-repository
+    environment: test
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2 
+      -
+        name: Get New Optilogic Token
+        id: get_token
+        run: |
+          token=$(python optilogic/get_token.py --username=${{ secrets.OPTILOGIC_USERNAME }} --password=${{ secrets.OPTILOGIC_PASSWORD }} -d)
+          echo "::set-output name=optilogic_token::$token"
+      -
+        name: Solve Model
+        env:
+          optilogic_token: ${{ steps.get_token.outputs.optilogic_token }}
+          optilogic_workspace: 'Studio'
+          optilogic_directory_path: 'My Models/optimization-ops/src'
+          optilogic_filename: 'solve.py'
+          commandArgs: '--scenario=baseline -oo'
+        run: |
+          shaTag=$(git rev-parse --short "$GITHUB_SHA") && \
+          job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" --commandArgs="$commandArgs" --jobTags="$shaTag,oomtest" -d)
+          echo "::set-output name=sync_job_key::$job_key"
+          job_status=$(python optilogic/wait_for_job_completion.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKey=$job_key -d)
+          echo "Sync Job is $job_status"
