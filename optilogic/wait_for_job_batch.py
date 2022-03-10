@@ -18,8 +18,8 @@ def wait_for_job_batch(args):
     for j in job_keys:
         job_completion_args = JobCompletionArgs(
             workspace = args.workspace,
-            jobKey = j
-            apiKey = args.apiKey
+            jobKey = j,
+            apiKey = args.apiKey,
             d = args.d
             )
         job_status = wait_for_job_completion(job_completion_args)
