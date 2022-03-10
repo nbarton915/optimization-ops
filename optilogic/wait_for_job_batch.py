@@ -2,8 +2,6 @@ import argparse
 from dataclasses import dataclass
 from multiprocessing.connection import wait
 
-from blessings import Terminal
-
 dataclass
 class JobCompletionArgs(object):
     workspace: str

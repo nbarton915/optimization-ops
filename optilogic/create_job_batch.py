@@ -19,11 +19,13 @@ def create_job_batch(args):
 
     if hasattr(args, 'appKey') and args.appKey:
         headers = {
-        'X-APP-KEY': f'{args.appKey}'
+        'X-APP-KEY': f'{args.appKey}',
+        'content-type': 'application/json'
         }
     else:
         headers = {
-            'X-API-KEY': f'{args.apiKey}'
+            'X-API-KEY': f'{args.apiKey}',
+            'content-type': 'application/json'
             }
 
     data = {
