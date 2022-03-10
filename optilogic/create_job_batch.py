@@ -39,9 +39,6 @@ def create_job_batch(args):
     }
 
     response = requests.request('POST', url, headers=headers, json=data)
-    print(response.request.url)
-    print(response.request.headers)
-    print(response.request.body)
     job_object = json.loads(response.text)
     try:
         job_key = job_object['jobKey']
