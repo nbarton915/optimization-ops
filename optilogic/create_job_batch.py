@@ -34,7 +34,7 @@ def create_job_batch(args):
             ["src/*python"],
             ["optimization-ops/src"],
             ["My Models/optimization-ops/src/"],
-            ["My Models/optimization-ops/src/solve.py"],
+            ["/projects/My Models/optimization-ops/src/solve.py"],
             ["My Models/optimization-ops/src/solve.py", "--scenario baseline"],
             ["optimization-ops/src/", "--scenario baseline"],
             ["optimization-ops/src/", "--scenario scenario1"],
