@@ -10,29 +10,36 @@ class JobCompletionArgs(object):
     appKey: str
     d: bool
 
+def check_individual_job_status(job_key) -> str:
+    job_status = None
+    job_completion_args = JobCompletionArgs(
+        workspace = args.workspace,
+        jobKey = j,
+        apiKey = args.apiKey,
+        appKey = args.appKey,
+        d = args.d
+        )
+    try:
+        job_status = wait_for_job_completion(job_completion_args)
+    except Exception as e:
+        print(f'The following job is not in a terminal status: {j=}\n\n')
+        print(e)
+    if not TerminalJobStatus.is_valid_terminal_status(job_status):
+        print(f'The following job is not in a terminal status: {j=}')
+    return job_status
+
 def wait_for_job_batch(args):
     from wait_for_job_completion import wait_for_job_completion, TerminalJobStatus
     job_keys = args.jobKeys
     if job_keys == 'job_keys.pkl':
         with open(job_keys, 'rb') as f:
             job_keys = pickle.load(f)
-    all_status = {}
-    for j in job_keys:
-        job_status = None
-        job_completion_args = JobCompletionArgs(
-            workspace = args.workspace,
-            jobKey = j,
-            apiKey = args.apiKey,
-            appKey = args.appKey,
-            d = args.d
-            )
-        try:
-            job_status = wait_for_job_completion(job_completion_args)
-        except Exception as e:
-            print(f'The following job is not in a terminal status: {j=}\n\n')
-            print(e)
-        if not TerminalJobStatus.is_valid_terminal_status(job_status):
-            print(f'The following job is not in a terminal status: {j=}')
+        all_status = {}
+        for j in job_keys:
+            job_status = check_individual_job_status(j)
+            all_status[j] = job_status
+    else:
+        job_status = check_individual_job_status(job_keys)
         all_status[j] = job_status
     return all_status
 
