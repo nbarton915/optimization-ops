@@ -38,8 +38,11 @@ def wait_for_job_completion(args):
             response = requests.request('GET', url, headers=headers)
             job_object = json.loads(response.text)
             job_status = job_object['status']
+        except KeyError as e:
+            e.message += f'There was a problem getting the job status. No longer checking for safety sake.\n\n{job_object=}'
+            raise
         except Exception as e:
-            print(f'There was a problem getting the job status. No longer checking for safety sake.\n\n{job_object}')
+            e.message += f'There was a problem getting the job status. No longer checking for safety sake.\n\n{job_object=}'
             raise
     return job_status
 
