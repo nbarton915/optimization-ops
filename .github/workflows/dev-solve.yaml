@@ -137,7 +137,7 @@ jobs:
         name: Get New Optilogic Token
         id: get_token
         run: |
-          token=$(python optilogic/get_token.py --username=${{ secrets.OPTILOGIC_USERNAME }} --password=${{ secrets.OPTILOGIC_PASSWORD }} -d)
+          token=$(python3 optilogic/get_token.py --username=${{ secrets.OPTILOGIC_USERNAME }} --password=${{ secrets.OPTILOGIC_PASSWORD }} -d)
           echo "::set-output name=optilogic_token::$token"
       -
         name: Create Batch
@@ -149,6 +149,6 @@ jobs:
           jobify: ${{ matrix.jobify }}
         run: |
           shaTag=$(git rev-parse --short "$GITHUB_SHA") && \
-          job_keys=$(python create_job_batch.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --searchForMatches="$search" --jobify="$jobify" --jobTags="$shaTag,batchtest,$search,$jobify" --verboseOutput=True -d)
-          all_job_status=$(python wait_for_job_batch.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKeys=$job_keys -d)
-          echo "$all_job_status" | jq
+          job_keys=$(python3 create_job_batch.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --searchForMatches="$search" --jobify="$jobify" --jobTags="$shaTag,batchtest,$search,$jobify" --verboseOutput=True -d) && \
+          all_job_status=$(python3 wait_for_job_batch.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKeys=$job_keys -d) && \
+          echo "$all_job_status"
