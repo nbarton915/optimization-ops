@@ -1,6 +1,7 @@
 import argparse
 import json
 import requests
+import pickle
 
 def create_job_batch(args):
     url = f'https://api.optilogic.app/v0/{args.workspace}/job/batch?'
@@ -51,9 +52,11 @@ def create_job_batch(args):
     else:
         try:
             job_keys = job_object['jobKeys']
-            return job_keys
         except Exception as e:
             print(f'There was an error with getting the jobKeys\n\nResponse: {job_object}')
+        with open('job_keys.pkl', 'wb') as f:
+                pickle.dump(job_keys, f)
+        return 'job_keys.pkl'
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Create a new Optilogic Job')

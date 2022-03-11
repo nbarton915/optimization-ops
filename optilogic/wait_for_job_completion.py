@@ -20,9 +20,15 @@ def wait_for_job_completion(args):
     url = f'https://api.optilogic.app/v0/{args.workspace}/job/{args.jobKey}?op=status'
     if args.d:
         url = url.replace('api.', 'dev.api.')
-    headers = {
-        'X-API-KEY': f'{args.apiKey}'
-        }
+
+    if args.appKey:
+        headers = {
+            'X-APP-KEY': f'{args.appKey}'
+            }
+    else:
+        headers = {
+            'X-API-KEY': f'{args.apiKey}'
+            }
 
     complete_status_list = ['done', 'error', 'cancelled', 'stopped']
     job_status = None
@@ -42,6 +48,7 @@ if __name__ == '__main__':
     parser.add_argument('--workspace', help='Optilogic Workspace Name')
     parser.add_argument('--jobKey', help='Optilogic Job Key')
     parser.add_argument('--apiKey', help='Optilogic Token')
+    parser.add_argument('--appKey', help='Optilogic App Key')
     parser.add_argument('-d', action='store_true')
 
     args = parser.parse_args()

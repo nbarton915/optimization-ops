@@ -148,6 +148,6 @@ jobs:
           jobify: ${{ matrix.jobify }}
         run: |
           shaTag=$(git rev-parse --short "$GITHUB_SHA") && \
-          job_keys=$(python optilogic/create_job_batch.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --searchForMatches="$search" --jobify="$jobify" --jobTags="$shaTag,batchtest,$search,$jobify" -d)
+          job_keys=$(python optilogic/create_job_batch.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --searchForMatches="$search" --jobify="$jobify" --jobTags="$shaTag,batchtest,$search,$jobify" --verboseOutput=True -d)
           all_job_status=$(python optilogic/wait_for_job_batch.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKeys=$job_keys -d)
-          echo "Sync Job is $all_job_status"
+          echo "$all_job_status" | jq
