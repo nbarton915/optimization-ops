@@ -14,7 +14,7 @@ def check_individual_job_status(job_key) -> str:
     job_status = None
     job_completion_args = JobCompletionArgs(
         workspace = args.workspace,
-        jobKey = j,
+        jobKey = job_key,
         apiKey = args.apiKey,
         appKey = args.appKey,
         d = args.d
@@ -22,10 +22,10 @@ def check_individual_job_status(job_key) -> str:
     try:
         job_status = wait_for_job_completion(job_completion_args)
     except Exception as e:
-        print(f'The following job is not in a terminal status: {j=}\n\n')
+        print(f'The following job is not in a terminal status: {job_key=}\n\n')
         print(e)
     if not TerminalJobStatus.is_valid_terminal_status(job_status):
-        print(f'The following job is not in a terminal status: {j=}')
+        print(f'The following job is not in a terminal status: {job_key=}')
     return job_status
 
 def wait_for_job_batch(args):
