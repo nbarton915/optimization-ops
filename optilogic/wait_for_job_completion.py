@@ -39,11 +39,9 @@ def wait_for_job_completion(args):
             job_object = json.loads(response.text)
             job_status = job_object['status']
         except KeyError as e:
-            e.message += f'There was a problem getting the job status. No longer checking for safety sake.\n\n{job_object=}'
-            raise
+            raise type(err)(f'There was a problem getting the job status. No longer checking for safety sake.\n\n{job_object=}')
         except Exception as e:
-            e.message += f'There was a problem getting the job status. No longer checking for safety sake.\n\n{job_object=}'
-            raise
+            raise type(err)(f'There was a problem getting the job status. No longer checking for safety sake.\n\n{job_object=}')
     return job_status
 
 if __name__ == '__main__':

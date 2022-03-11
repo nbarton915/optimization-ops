@@ -28,10 +28,10 @@ def wait_for_job_batch(args):
         try:
             job_status = wait_for_job_completion(job_completion_args)
         except Exception as e:
-            print(f'The following job is not in a terminal status: {job_status=}\n\n')
+            print(f'The following job is not in a terminal status: {j=}\n\n')
             print(e)
         if not TerminalJobStatus.is_valid_terminal_status(job_status):
-            print(f'The following job is not in a terminal status: {job_status=}')
+            print(f'The following job is not in a terminal status: {j=}')
         all_status[j] = job_status
     return all_status
 
