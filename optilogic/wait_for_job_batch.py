@@ -13,8 +13,9 @@ class JobCompletionArgs(object):
 def wait_for_job_batch(args):
     from wait_for_job_completion import wait_for_job_completion, TerminalJobStatus
     job_keys = args.jobKeys
-    with open(job_keys, 'rb') as f:
-        job_keys = pickle.load(f)
+    if job_keys == 'job_keys.pkl':
+        with open(job_keys, 'rb') as f:
+            job_keys = pickle.load(f)
     all_status = {}
     for j in job_keys:
         job_completion_args = JobCompletionArgs(
