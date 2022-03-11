@@ -141,6 +141,7 @@ jobs:
           echo "::set-output name=optilogic_token::$token"
       -
         name: Create Batch
+        working-directory: optilogic
         env:
           optilogic_token: ${{ steps.get_token.outputs.optilogic_token }}
           optilogic_workspace: 'Ursa-Minor'
@@ -148,6 +149,6 @@ jobs:
           jobify: ${{ matrix.jobify }}
         run: |
           shaTag=$(git rev-parse --short "$GITHUB_SHA") && \
-          job_keys=$(python optilogic/create_job_batch.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --searchForMatches="$search" --jobify="$jobify" --jobTags="$shaTag,batchtest,$search,$jobify" --verboseOutput=True -d)
-          all_job_status=$(python optilogic/wait_for_job_batch.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKeys=$job_keys -d)
+          job_keys=$(python create_job_batch.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --searchForMatches="$search" --jobify="$jobify" --jobTags="$shaTag,batchtest,$search,$jobify" --verboseOutput=True -d)
+          all_job_status=$(python wait_for_job_batch.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKeys=$job_keys -d)
           echo "$all_job_status" | jq
