@@ -31,6 +31,7 @@ def create_job_batch(args):
 
     data = {
         "batchItems": [
+            ["/projects/My Models/optimization-ops/src/solve.py"],
             ["src/*python"],
             ["optimization-ops/src"],
             ["My Models/optimization-ops/src/"],
