@@ -32,7 +32,7 @@ def check_individual_job_status(args, job_key) -> str:
 def wait_for_job_batch(args):
     job_keys = args.jobKeys
     all_status = {}
-    if job_keys.split('.')[1] == 'pkl':
+    if len(job_keys.split('.')) > 1 and job_keys.split('.')[1] == 'pkl':
         with open(job_keys, 'rb') as f:
             job_keys = pickle.load(f)
         for j in job_keys:
