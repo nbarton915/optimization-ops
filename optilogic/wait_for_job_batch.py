@@ -1,6 +1,7 @@
 import argparse
 from dataclasses import dataclass
 import pickle
+from wait_for_job_completion import wait_for_job_completion, TerminalJobStatus
 
 @dataclass()
 class JobCompletionArgs(object):
@@ -29,7 +30,6 @@ def check_individual_job_status(job_key) -> str:
     return job_status
 
 def wait_for_job_batch(args):
-    from wait_for_job_completion import wait_for_job_completion, TerminalJobStatus
     job_keys = args.jobKeys
     if job_keys == 'job_keys.pkl':
         with open(job_keys, 'rb') as f:
