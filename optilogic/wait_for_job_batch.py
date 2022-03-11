@@ -18,6 +18,7 @@ def wait_for_job_batch(args):
             job_keys = pickle.load(f)
     all_status = {}
     for j in job_keys:
+        job_status = None
         job_completion_args = JobCompletionArgs(
             workspace = args.workspace,
             jobKey = j,
