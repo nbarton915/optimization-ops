@@ -40,7 +40,7 @@ def wait_for_job_batch(args):
             all_status[j] = job_status
     else:
         job_status = check_individual_job_status(args, job_keys)
-        all_status[j] = job_status
+        all_status[job_keys] = job_status
     return all_status
 
 
