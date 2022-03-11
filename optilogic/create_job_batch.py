@@ -4,14 +4,14 @@ import requests
 
 def create_job_batch(args):
     url = f'https://api.optilogic.app/v0/{args.workspace}/job/batch?'
-    if args.searchForMatches:
-        url += f'&searchForMatches={args.searchForMatches}'
-    if args.jobify:
-        url += f'&jobify={args.jobify}'
+    if eval(str(args.searchForMatches)):
+        url += f'&searchForMatches=true'
+    if eval(str(args.jobify)):
+        url += f'&jobify=true'
     if hasattr(args, 'timeout') and args.timeout:
         url += f'&timeout={args.timeout}'
-    if args.verboseOutput:
-        url += f'&verboseOutput={args.verboseOutput}'
+    if eval(str(args.verboseOutput)):
+        url += f'&verboseOutput=true'
     if args.jobTags:
         url += f'&tags={args.jobTags}'
     if args.d:
@@ -42,11 +42,18 @@ def create_job_batch(args):
 
     response = requests.request('POST', url, headers=headers, json=data)
     job_object = json.loads(response.text)
-    try:
-        job_key = job_object['jobKey']
-        return job_key
-    except Exception as e:
-        print(f'There was an error with getting the jobKey\n\nResponse: {job_object}')
+    if not eval(str(args.jobify)):
+        try:
+            job_key = job_object['jobKey']
+            return job_key
+        except Exception as e:
+            print(f'There was an error with getting the jobKey\n\nResponse: {job_object}')
+    else:
+        try:
+            job_keys = job_object['jobKeys']
+            return job_keys
+        except Exception as e:
+            print(f'There was an error with getting the jobKeys\n\nResponse: {job_object}')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Create a new Optilogic Job')
@@ -61,5 +68,5 @@ if __name__ == '__main__':
     parser.add_argument('-d', action='store_true')
 
     args = parser.parse_args()
-    job_key = create_job_batch(args)
-    print(job_key)
+    job_key_s = create_job_batch(args)
+    print(job_key_s)
