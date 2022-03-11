@@ -1,9 +1,10 @@
-name: Solve Model
+name: Solve Model Test
 
 on:
   push:
     branches:
       - test
+  workflow_dispatch:
 
 jobs:
   sync-repository:
