@@ -153,3 +153,10 @@ jobs:
           job_keys=$(python3 create_job_batch.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --searchForMatches="$search" --jobify="$jobify" --jobTags="$shaTag,batchtest,$search,$jobify" --verboseOutput=True -d) && \
           all_job_status=$(python3 wait_for_job_batch.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKeys=$job_keys -d) && \
           echo "$all_job_status"
+      -
+        name: Upload job_keys pkl
+        uses: actions/upload-artifact@v2
+        if: hashFiles('job_keys.pkl') != ''
+        with:
+          name: job_keys
+          path: job_keys.pkl
