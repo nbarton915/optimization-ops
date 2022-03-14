@@ -45,15 +45,6 @@ for c in range(0, checkpoints):
 opti.JobUtils.add_record(opti.JobUtils.Keys.STAGE, 'model initialization')
 modelName = 'advanced'
 
-# Path objects
-inputPath = common.ensureDirectory(f"../inputs/{input_scenario_directory}") # Relative path to input files
-outputPath = common.ensureDirectory("../outputs") # Relative path to output files
-logPath = common.ensureDirectory("../logs") # Relative path to log file
-
-# Filename variables
-logFilename = logPath / f"{dt.datetime.now()}.log"
-outputFilename = outputPath / 'flow_table.csv'
-
 # Logging
 logger = common.getLogger(logFilename)
 
@@ -63,6 +54,15 @@ if args.scenario:
 else:
     logger.info(f'No scenario provided. Running baseline')
     input_scenario_directory = 'baseline'
+
+# Path objects
+inputPath = common.ensureDirectory(f"../inputs/{input_scenario_directory}") # Relative path to input files
+outputPath = common.ensureDirectory("../outputs") # Relative path to output files
+logPath = common.ensureDirectory("../logs") # Relative path to log file
+
+# Filename variables
+logFilename = logPath / f"{dt.datetime.now()}.log"
+outputFilename = outputPath / 'flow_table.csv'
 
 # ---------------------------------------------
 # Main
