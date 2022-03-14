@@ -31,9 +31,9 @@ def create_job_batch(args):
 
     data = {
         "batchItems": [
-            ["/projects/My Models/optimization-ops/src/solve.py"],
+            ["/projects/My Models/optimization-ops/src/solve.py", , 5],
             ["src/*python"],
-            ["optimization-ops/src"],
+            ["optimization-ops/src", , 12],
             ["My Models/optimization-ops/src/"],
             ["/projects/My Models/optimization-ops/src/solve.py"],
             ["My Models/optimization-ops/src/solve.py", "--scenario baseline"],
