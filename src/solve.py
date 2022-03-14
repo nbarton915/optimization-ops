@@ -39,11 +39,6 @@ for c in range(0, checkpoints):
     time.sleep(10)
     print(f'{(c+1)*10} seconds have passed')
 
-if args.scenario:
-    input_scenario_directory = args.scenario
-else:
-    input_scenario_directory = 'baseline'
-
 # ---------------------------------------------
 # Initialization
 # ---------------------------------------------
@@ -61,6 +56,13 @@ outputFilename = outputPath / 'flow_table.csv'
 
 # Logging
 logger = common.getLogger(logFilename)
+
+if args.scenario:
+    logger.info(f'Running {scenario=}')
+    input_scenario_directory = args.scenario
+else:
+    logger.info(f'No scenario provided. Running baseline')
+    input_scenario_directory = 'baseline'
 
 # ---------------------------------------------
 # Main
