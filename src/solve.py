@@ -51,11 +51,11 @@ logFilename = logPath / f"{dt.datetime.now()}.log"
 logger = common.getLogger(logFilename)
 
 if args.scenario:
-    logger.info(f'Running {scenario=}')
     input_scenario_directory = args.scenario
+    logger.info(f'Running scenario={input_scenario_directory}')
 else:
-    logger.info(f'No scenario provided. Running baseline')
     input_scenario_directory = 'baseline'
+    logger.info(f'No scenario provided. Running baseline')
 
 # Path objects
 inputPath = common.ensureDirectory(f"../inputs/{input_scenario_directory}") # Relative path to input files
