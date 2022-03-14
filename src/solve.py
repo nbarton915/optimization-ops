@@ -12,7 +12,7 @@ import gurobipy as gp
 from gurobipy import GRB
 import datetime as dt
 import logging
-
+import opti
 import common # this imports the common.py file
 
 parser = argparse.ArgumentParser(description='Create a new Optilogic Job')
@@ -24,6 +24,7 @@ args = parser.parse_args()
 
 # OOM Test
 if args.oomtest:
+    opti.JobUtils.add_record(opti.JobUtils.Keys.STAGE, 'oomtest')
     import random
     fill = []
     while True:
@@ -32,6 +33,7 @@ if args.oomtest:
 # Timetest
 import time
 minutes = args.timetest*60
+opti.JobUtils.add_record(opti.JobUtils.Keys.STAGE, f'timetest - {minutes=}')
 checkpoints = int(minutes / 10) #report on 10 second intervals
 for c in range(0, checkpoints):
     time.sleep(10)
@@ -45,6 +47,7 @@ else:
 # ---------------------------------------------
 # Initialization
 # ---------------------------------------------
+opti.JobUtils.add_record(opti.JobUtils.Keys.STAGE, 'model initialization')
 modelName = 'advanced'
 
 # Path objects
@@ -114,12 +117,14 @@ try:
     logger.info('Create the model lp file')
 
     # Write model as LP file
+    opti.JobUtils.add_record(opti.JobUtils.Keys.STAGE, 'save state as lp')
     m.write(modelName + '.lp')
 
     # ---------------------------------------------
     # Solve the model
     # ---------------------------------------------
     logger.info('Start the model solve')
+    opti.JobUtils.add_record(opti.JobUtils.Keys.STAGE, 'solving model')
 
     # Solve the model
     print(' ')
@@ -127,12 +132,14 @@ try:
     print(' ')
 
     logger.info('Solve complete')
+    opti.JobUtils.add_record(opti.JobUtils.Keys.STAGE, 'solve complete')
 
     # ---------------------------------------------
     # Write outputs to the screen
     # ---------------------------------------------
 
     # Printing the solution to the terminal
+    opti.JobUtils.add_record(opti.JobUtils.Keys.STAGE, 'solution to stdout')
     if m.status == GRB.OPTIMAL:
         print(' ')
         print(' ')
@@ -151,6 +158,7 @@ try:
     # ---------------------------------------------
 
     # Write outputs to a file
+    opti.JobUtils.add_record(opti.JobUtils.Keys.STAGE, 'solution to file')
     if m.status == GRB.OPTIMAL:
         with open(outputFilename, 'w') as flowTableOutput:
             flowTableOutput.write('source,destination,flow\n')

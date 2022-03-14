@@ -12,9 +12,15 @@ def create_job(args):
         url += f'&tags={args.jobTags}'
     if args.d:
         url = url.replace('api.', 'dev.api.')
-    headers = {
-        'X-API-KEY': f'{args.apiKey}'
+    
+    if hasattr(args, 'appKey') and args.appKey:
+        headers = {
+        'X-APP-KEY': f'{args.appKey}'
         }
+    else:
+        headers = {
+            'X-API-KEY': f'{args.apiKey}'
+            }
 
     response = requests.request('POST', url, headers=headers)
     job_object = json.loads(response.text)
@@ -30,6 +36,7 @@ if __name__ == '__main__':
     parser.add_argument('--directoryPath', help='Optilogic Path to Directory')
     parser.add_argument('--filename', help='Optilogic Filename')
     parser.add_argument('--apiKey', help='Optilogic Token ')
+    parser.add_argument('--appKey', help='Optilogic App Key ')
     parser.add_argument('--commandArgs', help='Arg to pass to python')
     parser.add_argument('--jobTags', help='Tags to add to job')
     parser.add_argument('--timeout', help='Max time for job to run')

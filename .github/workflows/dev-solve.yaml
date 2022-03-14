@@ -1,9 +1,10 @@
-name: Solve Model
+name: Solve Model Test
 
 on:
   push:
     branches:
       - test
+  workflow_dispatch:
 
 jobs:
   sync-repository:
@@ -28,7 +29,8 @@ jobs:
           optilogic_directory_path: 'My Models/optimization-ops/optilogic'
           optilogic_filename: 'sync_repo.py'
         run: |
-          job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" -d)
+          shaTag=$(git rev-parse --short "$GITHUB_SHA") && \
+          job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" --jobTags="$shaTag,syncrepo" -d)
           echo "::set-output name=sync_job_key::$job_key"
           job_status=$(python optilogic/wait_for_job_completion.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKey=$job_key -d)
           echo "Sync Job is $job_status"
@@ -55,7 +57,8 @@ jobs:
           optilogic_filename: 'solve.py'
           commandArgs: '--scenario=baseline'
         run: |
-          job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" --commandArgs="$commandArgs" -d)
+          shaTag=$(git rev-parse --short "$GITHUB_SHA") && \
+          job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" --commandArgs="$commandArgs" --jobTags="$shaTag,solvetest" -d)
           echo "::set-output name=sync_job_key::$job_key"
           job_status=$(python optilogic/wait_for_job_completion.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKey=$job_key -d)
           echo "Sync Job is $job_status"
@@ -91,3 +94,62 @@ jobs:
           echo "::set-output name=sync_job_key::$job_key"
           job_status=$(python optilogic/wait_for_job_completion.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKey=$job_key -d)
           echo "Sync Job is $job_status"
+  oomtest:
+    runs-on: ubuntu-latest
+    needs: sync-repository
+    environment: test
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2 
+      -
+        name: Get New Optilogic Token
+        id: get_token
+        run: |
+          token=$(python optilogic/get_token.py --username=${{ secrets.OPTILOGIC_USERNAME }} --password=${{ secrets.OPTILOGIC_PASSWORD }} -d)
+          echo "::set-output name=optilogic_token::$token"
+      -
+        name: Solve Model
+        env:
+          optilogic_token: ${{ steps.get_token.outputs.optilogic_token }}
+          optilogic_workspace: 'Ursa-Minor'
+          optilogic_directory_path: 'My Models/optimization-ops/src'
+          optilogic_filename: 'solve.py'
+          commandArgs: '--scenario=baseline -oo'
+        run: |
+          shaTag=$(git rev-parse --short "$GITHUB_SHA") && \
+          job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" --commandArgs="$commandArgs" --jobTags="$shaTag,oomtest" -d)
+          echo "::set-output name=sync_job_key::$job_key"
+          job_status=$(python optilogic/wait_for_job_completion.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKey=$job_key -d)
+          echo "Sync Job is $job_status"
+  batchtest:
+    runs-on: ubuntu-latest
+    needs: sync-repository
+    environment: test
+    strategy:
+      matrix:
+        searchForMatches: ["True", "False"]
+        jobify: ["True", "False"]
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2 
+      -
+        name: Get New Optilogic Token
+        id: get_token
+        run: |
+          token=$(python3 optilogic/get_token.py --username=${{ secrets.OPTILOGIC_USERNAME }} --password=${{ secrets.OPTILOGIC_PASSWORD }} -d)
+          echo "::set-output name=optilogic_token::$token"
+      -
+        name: Create Batch
+        working-directory: optilogic
+        env:
+          optilogic_token: ${{ steps.get_token.outputs.optilogic_token }}
+          optilogic_workspace: 'Ursa-Minor'
+          search: ${{ matrix.searchForMatches }}
+          jobify: ${{ matrix.jobify }}
+        run: |
+          shaTag=$(git rev-parse --short "$GITHUB_SHA") && \
+          job_keys=$(python3 create_job_batch.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --searchForMatches="$search" --jobify="$jobify" --jobTags="$shaTag,batchtest,$search,$jobify" --verboseOutput=True -d) && \
+          all_job_status=$(python3 wait_for_job_batch.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKeys=$job_keys -d) && \
+          echo "$all_job_status"
