@@ -15,6 +15,8 @@ def create_job_batch(args):
         url += f'&verboseOutput=true'
     if args.jobTags:
         url += f'&tags={args.jobTags}'
+    if args.resourceConfig:
+        url += f'&resourceConfig={args.resourceConfig}'
     if args.d:
         url = url.replace('api.', 'dev.api.')
 
@@ -33,7 +35,7 @@ def create_job_batch(args):
         "batchItems": [
             {"filter": "/projects/My Models/optimization-ops/src/solve.py", "timeout": 5},
             {"filter": "src/*python"},
-            {"filter": "optimization-ops/src", "timeout": 12},
+            {"filter": "optimization-ops/src", "commandArgs": "-ttt", "timeout": 12},
             {"filter": "My Models/optimization-ops/src/"},
             {"filter": "/projects/My Models/optimization-ops/src/solve.py"},
             {"filter": "My Models/optimization-ops/src/solve.py", "commandArgs": "--scenario baseline"},
@@ -72,6 +74,7 @@ if __name__ == '__main__':
     parser.add_argument('--verboseOutput', help='controls if job log output is verbose')
     parser.add_argument('--jobTags', help='Tags to add to job')
     parser.add_argument('--timeout', help='Max time for job to run')
+    parser.add_argument('--resourceConfig', help='Job size to use')
     parser.add_argument('-d', action='store_true')
 
     args = parser.parse_args()
