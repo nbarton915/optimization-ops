@@ -31,14 +31,14 @@ def create_job_batch(args):
 
     data = {
         "batchItems": [
-            ["/projects/My Models/optimization-ops/src/solve.py", "", 5],
-            ["src/*python"],
-            ["optimization-ops/src", "", 12],
-            ["My Models/optimization-ops/src/"],
-            ["/projects/My Models/optimization-ops/src/solve.py"],
-            ["My Models/optimization-ops/src/solve.py", "--scenario baseline"],
-            ["optimization-ops/src/", "--scenario baseline"],
-            ["optimization-ops/src/", "--scenario scenario1"],
+            {"filter": "/projects/My Models/optimization-ops/src/solve.py", "timeout": 5},
+            {"filter": "src/*python"},
+            {"filter": "optimization-ops/src", "timeout": 12},
+            {"filter": "My Models/optimization-ops/src/"},
+            {"filter": "/projects/My Models/optimization-ops/src/solve.py"},
+            {"filter": "My Models/optimization-ops/src/solve.py", "commandArgs": "--scenario baseline"},
+            {"filter": "optimization-ops/src/", "commandArgs": "--scenario baseline"},
+            {"filter": "optimization-ops/src/", "commandArgs": "--scenario scenario1", "timeout": 25},
             ]
     }
 
