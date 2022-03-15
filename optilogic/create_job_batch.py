@@ -39,8 +39,8 @@ def create_job_batch(args):
             {"filter": "My Models/optimization-ops/src/"},
             {"filter": "/projects/My Models/optimization-ops/src/solve.py"},
             {"filter": "My Models/optimization-ops/src/solve.py", "commandArgs": "--scenario baseline"},
-            {"filter": "optimization-ops/src/", "commandArgs": "--scenario baseline"},
-            {"filter": "optimization-ops/src/", "commandArgs": "--scenario scenario1", "timeout": 25},
+            {"filter": "optimization-ops/src/", "commandArgs": "--scenario baseline -ttt", "timeout": 25},
+            {"filter": "optimization-ops/src/", "commandArgs": "--scenario scenario1"},
             ]
     }
 
