@@ -24,7 +24,7 @@ args = parser.parse_args()
 
 # OOM Test
 if args.oomtest:
-    opti.JobUtils.add_record(opti.JobUtils.Keys.STAGE, 'oomtest')
+    opti.Job.add_record(opti.Job.Keys.STAGE, 'oomtest')
     import random
     fill = []
     while True:
@@ -33,16 +33,16 @@ if args.oomtest:
 # Timetest
 import time
 minutes = args.timetest*60
-opti.JobUtils.add_record(opti.JobUtils.Keys.STAGE, f'timetest - {minutes=}')
+opti.Job.add_record(opti.Job.Keys.STAGE, f'timetest - {minutes=}')
 checkpoints = int(minutes / 10) #report on 10 second intervals
 for c in range(0, checkpoints):
     time.sleep(10)
-    print(f'{(c+1)*10} seconds have passed')
+    opti.Job.add_record(opti.Job.Keys.INFO, f'{(c+1)*10} seconds have passed')
 
 # ---------------------------------------------
 # Initialization
 # ---------------------------------------------
-opti.JobUtils.add_record(opti.JobUtils.Keys.STAGE, 'model initialization')
+opti.Job.add_record(opti.Job.Keys.STAGE, 'model initialization')
 modelName = 'advanced'
 
 # Logging
@@ -53,9 +53,11 @@ logger = common.getLogger(logFilename)
 if args.scenario:
     input_scenario_directory = args.scenario
     logger.info(f'Running scenario={input_scenario_directory}')
+    opti.Job.add_record(opti.Job.Keys.INFO, f'Running scenario={input_scenario_directory}')
 else:
     input_scenario_directory = 'baseline'
     logger.info(f'No scenario provided. Running baseline')
+    opti.Job.add_record(opti.Job.Keys.INFO, f'No scenario provided. Running baseline')
 
 # Path objects
 inputPath = common.ensureDirectory(f"../inputs/{input_scenario_directory}") # Relative path to input files
@@ -119,14 +121,14 @@ try:
     logger.info('Create the model lp file')
 
     # Write model as LP file
-    opti.JobUtils.add_record(opti.JobUtils.Keys.STAGE, 'save state as lp')
+    opti.Job.add_record(opti.Job.Keys.STAGE, 'save state as lp')
     m.write(modelName + '.lp')
 
     # ---------------------------------------------
     # Solve the model
     # ---------------------------------------------
     logger.info('Start the model solve')
-    opti.JobUtils.add_record(opti.JobUtils.Keys.STAGE, 'solving model')
+    opti.Job.add_record(opti.Job.Keys.STAGE, 'solving model')
 
     # Solve the model
     print(' ')
@@ -134,14 +136,14 @@ try:
     print(' ')
 
     logger.info('Solve complete')
-    opti.JobUtils.add_record(opti.JobUtils.Keys.STAGE, 'solve complete')
+    opti.Job.add_record(opti.Job.Keys.STAGE, 'solve complete')
 
     # ---------------------------------------------
     # Write outputs to the screen
     # ---------------------------------------------
 
     # Printing the solution to the terminal
-    opti.JobUtils.add_record(opti.JobUtils.Keys.STAGE, 'solution to stdout')
+    opti.Job.add_record(opti.Job.Keys.STAGE, 'solution to stdout')
     if m.status == GRB.OPTIMAL:
         print(' ')
         print(' ')
@@ -160,7 +162,7 @@ try:
     # ---------------------------------------------
 
     # Write outputs to a file
-    opti.JobUtils.add_record(opti.JobUtils.Keys.STAGE, 'solution to file')
+    opti.Job.add_record(opti.Job.Keys.STAGE, 'solution to file')
     if m.status == GRB.OPTIMAL:
         with open(outputFilename, 'w') as flowTableOutput:
             flowTableOutput.write('source,destination,flow\n')
