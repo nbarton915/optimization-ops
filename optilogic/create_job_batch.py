@@ -4,15 +4,21 @@ import requests
 import pickle
 
 def create_job_batch(args):
-    url = f'https://api.optilogic.app/v0/{args.workspace}/job/batch?'
-    if eval(str(args.searchForMatches)):
-        url += f'&searchForMatches=true'
     if eval(str(args.jobify)):
-        url += f'&jobify=true'
-    if hasattr(args, 'timeout') and args.timeout:
-        url += f'&timeout={args.timeout}'
-    if eval(str(args.verboseOutput)):
-        url += f'&verboseOutput=true'
+        if eval(str(args.searchForMatches)):
+            url = f'https://api.optilogic.app/v0/{args.workspace}/jobBatch/jobify/searchNRun?'
+        else:
+            url = f'https://api.optilogic.app/v0/{args.workspace}/jobBatch/jobify?'
+    else:
+        if eval(str(args.searchForMatches)):
+            url = f'https://api.optilogic.app/v0/{args.workspace}/jobBatch/backToBack/searchNRun?'
+        else:
+            url = f'https://api.optilogic.app/v0/{args.workspace}/jobBatch/backToBack?'
+        if eval(str(args.verboseOutput)):
+            url += f'&verboseOutput=true'
+        if hasattr(args, 'timeout') and args.timeout:
+            url += f'&timeout={args.timeout}'
+            
     if args.jobTags:
         url += f'&tags={args.jobTags}'
     if args.resourceConfig:
@@ -33,14 +39,14 @@ def create_job_batch(args):
 
     data = {
         "batchItems": [
-            {"filter": "/projects/My Models/optimization-ops/src/solve.py", "timeout": 5},
-            {"filter": "src/*python"},
-            {"filter": "optimization-ops/src", "commandArgs": "-ttt", "timeout": 12},
-            {"filter": "My Models/optimization-ops/src/"},
-            {"filter": "/projects/My Models/optimization-ops/src/solve.py"},
-            {"filter": "My Models/optimization-ops/src/solve.py", "commandArgs": "--scenario baseline"},
-            {"filter": "optimization-ops/src/", "commandArgs": "--scenario baseline -ttt", "timeout": 25},
-            {"filter": "optimization-ops/src/", "commandArgs": "--scenario scenario1"},
+            {"pyModulePath": "/projects/My Models/optimization-ops/src/solve.py", "timeout": 5},
+            {"pySearchTerm": "src/*python"},
+            {"pySearchTerm": "optimization-ops/src", "commandArgs": "-ttt", "timeout": 12},
+            {"pySearchTerm": "My Models/optimization-ops/src/"},
+            {"pyModulePath": "/projects/My Models/optimization-ops/src/solve.py"},
+            {"pyModulePath": "My Models/optimization-ops/src/solve.py", "commandArgs": "--scenario baseline"},
+            {"pySearchTerm": "optimization-ops/src/", "commandArgs": "--scenario baseline -ttt", "timeout": 25},
+            {"pySearchTerm": "optimization-ops/src/", "commandArgs": "--scenario scenario1"},
             ]
     }
 
