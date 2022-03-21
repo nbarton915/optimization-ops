@@ -3,7 +3,8 @@ import json
 import requests
 import pickle
 
-NON_SEARCH_TEST = {
+def create_job_batch(args):
+    non_search_test = {
         "batchItems": [
             {"pyModulePath": "/projects/My Models/optimization-ops/src/solve.py", "timeout": 5},
             {"pyModulePath": "/projects/My Models/optimization-ops/src/solve.py"},
@@ -11,32 +12,31 @@ NON_SEARCH_TEST = {
             ]
     }
 
-SEARCH_TEST = {
-        "batchItems": [
-            {"pySearchTerm": "src/*python"},
-            {"pySearchTerm": "optimization-ops/src", "commandArgs": "-ttt", "timeout": 12},
-            {"pySearchTerm": "My Models/optimization-ops/src/"},
-            {"pySearchTerm": "optimization-ops/src/", "commandArgs": "--scenario baseline -ttt", "timeout": 25},
-            {"pySearchTerm": "optimization-ops/src/", "commandArgs": "--scenario scenario1"},
-            ]
-    }
+    search_test = {
+            "batchItems": [
+                {"pySearchTerm": "src/*python"},
+                {"pySearchTerm": "optimization-ops/src", "commandArgs": "-ttt", "timeout": 12},
+                {"pySearchTerm": "My Models/optimization-ops/src/"},
+                {"pySearchTerm": "optimization-ops/src/", "commandArgs": "--scenario baseline -ttt", "timeout": 25},
+                {"pySearchTerm": "optimization-ops/src/", "commandArgs": "--scenario scenario1"},
+                ]
+        }
 
-def create_job_batch(args):
     if eval(str(args.jobify)):
         if eval(str(args.searchForMatches)):
             url = f'https://api.optilogic.app/v0/{args.workspace}/jobBatch/jobify/searchNRun?'
-            data = SEARCH_TESTS
+            data = search_test
         else:
             url = f'https://api.optilogic.app/v0/{args.workspace}/jobBatch/jobify?'
-            data = NON_SEARCH_TEST
+            data = non_search_test
     else:
         if eval(str(args.searchForMatches)):
             url = f'https://api.optilogic.app/v0/{args.workspace}/jobBatch/backToBack/searchNRun?'
-            data = SEARCH_TESTS
+            data = search_test
         else:
             url = f'https://api.optilogic.app/v0/{args.workspace}/jobBatch/backToBack?'
-            data = NON_SEARCH_TEST
-            
+            data = non_search_test
+
         if eval(str(args.verboseOutput)):
             url += f'&verboseOutput=true'
         if hasattr(args, 'timeout') and args.timeout:
