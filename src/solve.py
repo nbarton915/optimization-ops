@@ -27,6 +27,7 @@ parser.add_argument('--directoryPath', help='Optilogic Path to Directory')
 parser.add_argument('--filename', help='Optilogic Filename')
 parser.add_argument('--apiKey', help='Optilogic Token ')
 parser.add_argument('--appKey', help='Optilogic App Key ')
+parser.add_argument('--hash', help='Commit hash')
 parser.add_argument('-d', action='store_true')
 
 args = parser.parse_args()
@@ -184,10 +185,12 @@ except Exception as e:
 if args.callbacktest and args.workspace is not None:
     missing_key = False
     if args.appKey is not None:
+        print('using appKey')
         headers = {
             'X-APP-KEY': f'{args.appKey}'
         }
     elif args.apiKey is not None:
+        print('using apiKey')
         headers = {
             'X-API-KEY': f'{args.apiKey}'
         }
@@ -195,7 +198,7 @@ if args.callbacktest and args.workspace is not None:
         missing_key = True
     
     if not missing_key:
-        url = f'https://api.optilogic.app/{args.workspace}/job?directoryPath=My Models/optimization-ops/src&filename=cleanup.py&tags=cleanupJob&commandArgs=--path=output/flow_table.py'
+        url = f'https://api.optilogic.app/{args.workspace}/job?directoryPath="My Models/optimization-ops/src"&filename=cleanup.py&tags={args.hash},callbacktest&commandArgs=--path=output/flow_table.py'
         if args.d:
             url = url.replace('api.', 'dev.api.')
         optilogic.pioneer.Job.add_record('callback', 'Start Cleanup Job', url, headers)

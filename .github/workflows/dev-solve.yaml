@@ -184,7 +184,7 @@ jobs:
           commandArgs: '--scenario=baseline --workspace=Ursa-Minor --apiKey=${{ steps.get_token.outputs.optilogic_token }} -c -d'
         run: |
           shaTag=$(git rev-parse --short "$GITHUB_SHA") && \
-          job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" --commandArgs="$commandArgs" --jobTags="$shaTag,callbacktest" -d)
+          job_key=$(python optilogic/create_job.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --directoryPath="${optilogic_directory_path}" --filename="$optilogic_filename" --commandArgs="$commandArgs --hash=$shaTag" --jobTags="$shaTag,callbacktest" -d)
           echo "::set-output name=sync_job_key::$job_key"
           job_status=$(python optilogic/wait_for_job_completion.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKey=$job_key -d)
           echo "Sync Job is $job_status"
