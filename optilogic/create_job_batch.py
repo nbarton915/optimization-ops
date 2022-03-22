@@ -7,7 +7,7 @@ def create_job_batch(args):
     non_search_test = {
         "batchItems": [
             {"pyModulePath": "/projects/My Models/optimization-ops/src/solve.py", "timeout": 5},
-            {"pyModulePath": "/projects/My Models/optimization-ops/src/solve.py"},
+            {"pyModulePath": "/My Models/optimization-ops/src/solve.py"},
             {"pyModulePath": "My Models/optimization-ops/src/solve.py", "commandArgs": "--scenario baseline"},
             ]
     }

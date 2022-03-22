@@ -185,12 +185,10 @@ except Exception as e:
 if args.callbacktest and args.workspace is not None:
     missing_key = False
     if args.appKey is not None:
-        print('using appKey')
         headers = {
             'X-APP-KEY': f'{args.appKey}'
         }
     elif args.apiKey is not None:
-        print('using apiKey')
         headers = {
             'X-API-KEY': f'{args.apiKey}'
         }
