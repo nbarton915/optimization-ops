@@ -198,7 +198,7 @@ if args.callbacktest and args.workspace is not None:
         missing_key = True
     
     if not missing_key:
-        url = f'https://api.optilogic.app/{args.workspace}/job?directoryPath="My Models/optimization-ops/src"&filename=cleanup.py&tags={args.hash},callbacktest&commandArgs=--path=output/flow_table.py'
+        url = f'https://api.optilogic.app/v0/{args.workspace}/job?directoryPath=My Models/optimization-ops/src&filename=cleanup.py&tags={args.hash},callbacktest&commandArgs=--path=output/flow_table.py'
         if args.d:
             url = url.replace('api.', 'dev.api.')
         optilogic.pioneer.Job.add_record('callback', 'Start Cleanup Job', url, headers)
