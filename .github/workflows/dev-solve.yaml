@@ -150,7 +150,7 @@ jobs:
           jobify: ${{ matrix.jobify }}
         run: |
           shaTag=$(git rev-parse --short "$GITHUB_SHA") && \
-          job_keys=$(python3 create_job_batch.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --searchForMatches="$search" --jobify="$jobify" --jobTags="$shaTag,batchtest,$search,$jobify" --verboseOutput=True --timeout=30 --resourceConfig=M -d) && \
+          job_keys=$(python3 create_job_batch.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --searchForMatches="$search" --jobify="$jobify" --jobTags="$shaTag,batchtest,$search,$jobify" --verboseOutput=True --timeout=300 --resourceConfig=M -d) && \
           all_job_status=$(python3 wait_for_job_batch.py --apiKey=$optilogic_token --workspace=$optilogic_workspace --jobKeys=$job_keys -d) && \
           echo "$all_job_status"
       -
