@@ -183,11 +183,11 @@ except Exception as e:
 
 if args.callbacktest and args.workspace is not None:
     missing_key = False
-    if eval(str(args.appKey)):
+    if args.appKey is not None:
         headers = {
             'X-APP-KEY': f'{args.appKey}'
         }
-    elif eval(str(args.apiKey)):
+    elif args.apiKey is not None:
         headers = {
             'X-API-KEY': f'{args.apiKey}'
         }
@@ -195,7 +195,7 @@ if args.callbacktest and args.workspace is not None:
         missing_key = True
     
     if not missing_key:
-        url = f'https://api.optilogic.app/{args.workspace}/job?directoryPath=My Models/optimization-ops/src&filename=cleanup.py&tags=cleanupJob'
+        url = f'https://api.optilogic.app/{args.workspace}/job?directoryPath=My Models/optimization-ops/src&filename=cleanup.py&tags=cleanupJob&commandArgs=--path=output/flow_table.py'
         if args.d:
             url = url.replace('api.', 'dev.api.')
         optilogic.pioneer.Job.add_record('callback', 'Start Cleanup Job', url, headers)
