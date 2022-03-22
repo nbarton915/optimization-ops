@@ -181,7 +181,7 @@ try:
 except Exception as e:
     logger.critical(f'The model encountered an exception: {e}')
 
-if args.callbacktest and eval(str(args.workspace)):
+if args.callbacktest and args.workspace is not None:
     missing_key = False
     if eval(str(args.appKey)):
         headers = {
