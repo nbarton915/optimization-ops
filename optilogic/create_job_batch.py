@@ -19,6 +19,7 @@ def create_job_batch(args):
                 {"pySearchTerm": "My Models/optimization-ops/src/"},
                 {"pySearchTerm": "optimization-ops/src/", "commandArgs": "--scenario baseline -ttt", "timeout": 25},
                 {"pySearchTerm": "optimization-ops/src/", "commandArgs": "--scenario scenario1"},
+                {"pySearchTerm": "MIP Optimization\/\w+\/(?!parse_table)\w+\.py"}
                 ]
         }
 
