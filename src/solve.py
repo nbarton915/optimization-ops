@@ -12,19 +12,29 @@ import gurobipy as gp
 from gurobipy import GRB
 import datetime as dt
 import logging
-import opti
+import optilogic
 import common # this imports the common.py file
+
+optilogic.pioneer.Job.print_add_record_calls = True
 
 parser = argparse.ArgumentParser(description='Create a new Optilogic Job')
 parser.add_argument('--scenario', help='Scenario to run')
 parser.add_argument('--timetest', '-t', action='count', default=0, help='Add n minutes to the beginning of the solve')
 parser.add_argument('--oomtest', '-oo', action='store_true', help='run test that gets oom killed')
+parser.add_argument('--callbacktest', '-c', action='store_true', help='run test used the callback url at the end of the run')
+parser.add_argument('--workspace', help='Optilogic Workspace Name')
+parser.add_argument('--directoryPath', help='Optilogic Path to Directory')
+parser.add_argument('--filename', help='Optilogic Filename')
+parser.add_argument('--apiKey', help='Optilogic Token ')
+parser.add_argument('--appKey', help='Optilogic App Key ')
+parser.add_argument('--hash', help='Commit hash')
+parser.add_argument('-d', action='store_true')
 
 args = parser.parse_args()
 
 # OOM Test
 if args.oomtest:
-    opti.JobUtils.add_record(opti.JobUtils.Keys.STAGE, 'oomtest')
+    optilogic.pioneer.Job.add_record(optilogic.pioneer.Job.Keys.STAGE, 'oomtest')
     import random
     fill = []
     while True:
@@ -33,34 +43,38 @@ if args.oomtest:
 # Timetest
 import time
 minutes = args.timetest*60
-opti.JobUtils.add_record(opti.JobUtils.Keys.STAGE, f'timetest - {minutes=}')
+optilogic.pioneer.Job.add_record(optilogic.pioneer.Job.Keys.STAGE, f'timetest - {minutes=}')
 checkpoints = int(minutes / 10) #report on 10 second intervals
 for c in range(0, checkpoints):
     time.sleep(10)
-    print(f'{(c+1)*10} seconds have passed')
-
-if args.scenario:
-    input_scenario_directory = args.scenario
-else:
-    input_scenario_directory = 'baseline'
+    optilogic.pioneer.Job.add_record(optilogic.pioneer.Job.Keys.INFO, f'{(c+1)*10} seconds have passed')
 
 # ---------------------------------------------
 # Initialization
 # ---------------------------------------------
-opti.JobUtils.add_record(opti.JobUtils.Keys.STAGE, 'model initialization')
+optilogic.pioneer.Job.add_record(optilogic.pioneer.Job.Keys.STAGE, 'model initialization')
 modelName = 'advanced'
+
+# Logging
+logPath = common.ensureDirectory("../logs") # Relative path to log file
+logFilename = logPath / f"{dt.datetime.now()}.log"
+logger = common.getLogger(logFilename)
+
+if args.scenario:
+    input_scenario_directory = args.scenario
+    logger.info(f'Running scenario={input_scenario_directory}')
+    optilogic.pioneer.Job.add_record(optilogic.pioneer.Job.Keys.INFO, f'Running scenario={input_scenario_directory}')
+else:
+    input_scenario_directory = 'baseline'
+    logger.info(f'No scenario provided. Running baseline')
+    optilogic.pioneer.Job.add_record(optilogic.pioneer.Job.Keys.INFO, f'No scenario provided. Running baseline')
 
 # Path objects
 inputPath = common.ensureDirectory(f"../inputs/{input_scenario_directory}") # Relative path to input files
 outputPath = common.ensureDirectory("../outputs") # Relative path to output files
-logPath = common.ensureDirectory("../logs") # Relative path to log file
 
 # Filename variables
-logFilename = logPath / f"{dt.datetime.now()}.log"
 outputFilename = outputPath / 'flow_table.csv'
-
-# Logging
-logger = common.getLogger(logFilename)
 
 # ---------------------------------------------
 # Main
@@ -117,14 +131,14 @@ try:
     logger.info('Create the model lp file')
 
     # Write model as LP file
-    opti.JobUtils.add_record(opti.JobUtils.Keys.STAGE, 'save state as lp')
+    optilogic.pioneer.Job.add_record(optilogic.pioneer.Job.Keys.STAGE, 'save state as lp')
     m.write(modelName + '.lp')
 
     # ---------------------------------------------
     # Solve the model
     # ---------------------------------------------
     logger.info('Start the model solve')
-    opti.JobUtils.add_record(opti.JobUtils.Keys.STAGE, 'solving model')
+    optilogic.pioneer.Job.add_record(optilogic.pioneer.Job.Keys.STAGE, 'solving model')
 
     # Solve the model
     print(' ')
@@ -132,14 +146,14 @@ try:
     print(' ')
 
     logger.info('Solve complete')
-    opti.JobUtils.add_record(opti.JobUtils.Keys.STAGE, 'solve complete')
+    optilogic.pioneer.Job.add_record(optilogic.pioneer.Job.Keys.STAGE, 'solve complete')
 
     # ---------------------------------------------
     # Write outputs to the screen
     # ---------------------------------------------
 
     # Printing the solution to the terminal
-    opti.JobUtils.add_record(opti.JobUtils.Keys.STAGE, 'solution to stdout')
+    optilogic.pioneer.Job.add_record(optilogic.pioneer.Job.Keys.STAGE, 'solution to stdout')
     if m.status == GRB.OPTIMAL:
         print(' ')
         print(' ')
@@ -158,7 +172,7 @@ try:
     # ---------------------------------------------
 
     # Write outputs to a file
-    opti.JobUtils.add_record(opti.JobUtils.Keys.STAGE, 'solution to file')
+    optilogic.pioneer.Job.add_record(optilogic.pioneer.Job.Keys.STAGE, 'solution to file')
     if m.status == GRB.OPTIMAL:
         with open(outputFilename, 'w') as flowTableOutput:
             flowTableOutput.write('source,destination,flow\n')
@@ -167,6 +181,25 @@ try:
                     flowTableOutput.write(f"{i},{j},{solution[i, j]}\n")
 except Exception as e:
     logger.critical(f'The model encountered an exception: {e}')
+
+if args.callbacktest and args.workspace is not None:
+    missing_key = False
+    if args.appKey is not None:
+        headers = {
+            'X-APP-KEY': f'{args.appKey}'
+        }
+    elif args.apiKey is not None:
+        headers = {
+            'X-API-KEY': f'{args.apiKey}'
+        }
+    else:
+        missing_key = True
+    
+    if not missing_key:
+        url = f'https://api.optilogic.app/v0/{args.workspace}/job?directoryPath=My Models/optimization-ops/src&filename=cleanup.py&tags={args.hash},callbacktest&commandArgs=--path=output/flow_table.py'
+        if args.d:
+            url = url.replace('api.', 'dev.api.')
+        optilogic.pioneer.Job.add_record('callback', 'Start Cleanup Job', url, headers)
 
 # ---------------------------------------------
 # Cleanup

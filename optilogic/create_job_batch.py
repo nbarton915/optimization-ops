@@ -4,17 +4,49 @@ import requests
 import pickle
 
 def create_job_batch(args):
-    url = f'https://api.optilogic.app/v0/{args.workspace}/job/batch?'
-    if eval(str(args.searchForMatches)):
-        url += f'&searchForMatches=true'
+    non_search_test = {
+        "batchItems": [
+            {"pyModulePath": "/projects/My Models/optimization-ops/src/solve.py", "timeout": 5},
+            {"pyModulePath": "/My Models/optimization-ops/src/solve.py"},
+            {"pyModulePath": "My Models/optimization-ops/src/solve.py", "commandArgs": "--scenario baseline"},
+            ]
+    }
+
+    search_test = {
+            "batchItems": [
+                {"pySearchTerm": "src/*python"},
+                {"pySearchTerm": "optimization-ops/src", "commandArgs": "-ttt", "timeout": 12},
+                {"pySearchTerm": "My Models/optimization-ops/src/"},
+                {"pySearchTerm": "optimization-ops/src/", "commandArgs": "--scenario baseline -ttt", "timeout": 25},
+                {"pySearchTerm": "optimization-ops/src/", "commandArgs": "--scenario scenario1"},
+                {"pySearchTerm": "MIP Optimization\/\w+\/(?!parse_table)\w+\.py"}
+                ]
+        }
+
     if eval(str(args.jobify)):
-        url += f'&jobify=true'
-    if hasattr(args, 'timeout') and args.timeout:
-        url += f'&timeout={args.timeout}'
-    if eval(str(args.verboseOutput)):
-        url += f'&verboseOutput=true'
+        if eval(str(args.searchForMatches)):
+            url = f'https://api.optilogic.app/v0/{args.workspace}/jobBatch/jobify/searchNRun?'
+            data = search_test
+        else:
+            url = f'https://api.optilogic.app/v0/{args.workspace}/jobBatch/jobify?'
+            data = non_search_test
+    else:
+        if eval(str(args.searchForMatches)):
+            url = f'https://api.optilogic.app/v0/{args.workspace}/jobBatch/backToBack/searchNRun?'
+            data = search_test
+        else:
+            url = f'https://api.optilogic.app/v0/{args.workspace}/jobBatch/backToBack?'
+            data = non_search_test
+
+        if eval(str(args.verboseOutput)):
+            url += f'&verboseOutput=true'
+        if hasattr(args, 'timeout') and args.timeout:
+            url += f'&timeout={args.timeout}'
+
     if args.jobTags:
         url += f'&tags={args.jobTags}'
+    if args.resourceConfig:
+        url += f'&resourceConfig={args.resourceConfig}'
     if args.d:
         url = url.replace('api.', 'dev.api.')
 
@@ -29,21 +61,10 @@ def create_job_batch(args):
             'content-type': 'application/json'
             }
 
-    data = {
-        "batchItems": [
-            ["/projects/My Models/optimization-ops/src/solve.py"],
-            ["src/*python"],
-            ["optimization-ops/src"],
-            ["My Models/optimization-ops/src/"],
-            ["/projects/My Models/optimization-ops/src/solve.py"],
-            ["My Models/optimization-ops/src/solve.py", "--scenario baseline"],
-            ["optimization-ops/src/", "--scenario baseline"],
-            ["optimization-ops/src/", "--scenario scenario1"],
-            ]
-    }
-
     response = requests.request('POST', url, headers=headers, json=data)
     job_object = json.loads(response.text)
+    job_key = None
+    job_keys = None
     if not eval(str(args.jobify)):
         try:
             job_key = job_object['jobKey']
@@ -55,6 +76,7 @@ def create_job_batch(args):
             job_keys = job_object['jobKeys']
         except Exception as e:
             print(f'There was an error with getting the jobKeys\n\nResponse: {job_object}')
+        
         with open('job_keys.pkl', 'wb') as f:
                 pickle.dump(job_keys, f)
         return 'job_keys.pkl'
@@ -69,6 +91,7 @@ if __name__ == '__main__':
     parser.add_argument('--verboseOutput', help='controls if job log output is verbose')
     parser.add_argument('--jobTags', help='Tags to add to job')
     parser.add_argument('--timeout', help='Max time for job to run')
+    parser.add_argument('--resourceConfig', help='Job size to use')
     parser.add_argument('-d', action='store_true')
 
     args = parser.parse_args()
